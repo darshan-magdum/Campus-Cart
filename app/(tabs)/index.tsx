@@ -14,6 +14,9 @@ import UserProfile from "../../components/Screens/UserHome/UserProfile";
 import UserMenu from "../../components/Screens/UserHome/UserMenu";
 import ContactUs from "../../components/Screens/UserHome/ContactUs";
 import AboutUs from "../../components/Screens/UserHome/AboutUs";
+import SearchItems from "../../components/Screens/UserHome/SearchItems";
+import MyOrders from "../../components/Screens/UserHome/MyOrders";
+import RequestItem from "../../components/Screens/UserHome/RequestItem";
 import UserQuestionnaire from "../../components/Screens/UserHome/UserQuestionnaire";
 import UserResults from "../../components/Screens/UserHome/UserResults";
 import { NavigationContainer } from "@react-navigation/native";
@@ -72,6 +75,10 @@ export default function HomeScreen() {
             <Stack.Screen name="UserQuestionnaire" component={UserQuestionnaire} />
             <Stack.Screen name="UserResults" component={UserResults} />
             <Stack.Screen name="AboutUs" component={AboutUs} />
+            <Stack.Screen name="SearchItems" component={SearchItems} />
+            <Stack.Screen name="RequestItem" component={RequestItem} />
+              <Stack.Screen name="MyOrders" component={MyOrders} />
+            
           </>
         ) : (
           <>

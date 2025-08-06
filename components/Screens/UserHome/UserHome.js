@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -6,43 +6,45 @@ import FeatherIcon from "react-native-vector-icons/Feather";
 
 const UserHome = () => {
   const navigation = useNavigation();
-  const [isUserView, setisUserView] = useState(true);
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Campus Cart</Text>
+        <Text style={styles.headerText}>CampusMart</Text>
         <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('UserMenu')}>
           <Ionicons name="menu" size={24} color="red" />
         </TouchableOpacity>
       </View>
 
       <View style={styles.gridContainer}>
-        <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('FullHearingTest')}>
-          <FeatherIcon name="headphones" size={40} color="white" style={styles.icon} />
-          <Text style={styles.boxText}>Full Hearing Test</Text>
-          <Text style={styles.boxDescription}>Comprehensive test to assess your hearing capabilities.</Text>
+        <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('SearchItems')}>
+          <FeatherIcon name="search" size={40} color="white" style={styles.icon} />
+          <Text style={styles.boxText}>Search & Order</Text>
+          <Text style={styles.boxDescription}>Find items from nearby shops and order to your hostel.</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('UserQuestionnaire')}>
-          <FeatherIcon name="file-text" size={40} color="white" style={styles.icon} />
-          <Text style={styles.boxText}>Questionnaire</Text>
-          <Text style={styles.boxDescription}>Ask our AI system anything regarding hearing health.</Text>
+
+        <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('RequestItem')}>
+          <FeatherIcon name="plus-circle" size={40} color="white" style={styles.icon} />
+          <Text style={styles.boxText}>Request Item</Text>
+          <Text style={styles.boxDescription}>Can't find something? Request and let shops respond.</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('UserResults')}>
-          <FeatherIcon name="bar-chart-2" size={40} color="white" style={styles.icon} />
-          <Text style={styles.boxText}>View Result</Text>
-          <Text style={styles.boxDescription}>Check the outcome of your hearing test and analysis.</Text>
+
+        <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('MyOrders')}>
+          <FeatherIcon name="shopping-bag" size={40} color="white" style={styles.icon} />
+          <Text style={styles.boxText}>My Orders</Text>
+          <Text style={styles.boxDescription}>Track your orders and see your order history.</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('AboutUs')}>
           <FeatherIcon name="info" size={40} color="white" style={styles.icon} />
-          <Text style={styles.boxText}>About Us</Text>
-          <Text style={styles.boxDescription}>Learn more about Campus Cart and our mission.</Text>
+          <Text style={styles.boxText}>About CampusMart</Text>
+          <Text style={styles.boxDescription}>Learn about our mission and how this app works.</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>Need Help?</Text>
-        <Text style={styles.footerDescription}>Contact our support team for assistance with your hearing test.</Text>
+        <Text style={styles.footerDescription}>Contact our support team for help with orders or requests.</Text>
         <TouchableOpacity style={styles.contactButton} onPress={() => navigation.navigate('ContactUs')}>
           <Text style={styles.contactButtonText}>Contact Support</Text>
         </TouchableOpacity>
@@ -61,7 +63,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 8,
-    backgroundColor: '#301792', 
+    backgroundColor: '#301792',
   },
   headerText: {
     fontSize: 22,
