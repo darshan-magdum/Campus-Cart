@@ -4,145 +4,99 @@ import {
   FlatList, Image, ScrollView, Modal
 } from 'react-native';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
 
-const Card = ({ image, name, category, isVeg, price, shopName, date, searchQuery, description }) => {
-  const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
-
-  const formatDate = (dateString) => {
-    const dateObj = new Date(dateString);
-    return `${dateObj.getDate()}-${dateObj.getMonth() + 1}-${dateObj.getFullYear()}`;
-  };
-
-  return matchesSearch ? (
-    <View style={styles.foodCard}>
-      <Image source={{ uri: image }} style={styles.foodImage} resizeMode="cover" />
-      <View style={styles.priceBadge}>
-        <Text style={styles.priceText}>₹{price}</Text>
-      </View>
-      <View style={styles.foodBottom}>
-        <View style={styles.foodLeft}>
-          <Text style={styles.foodName}>{name}</Text>
-          <Text style={styles.vendorName}>{description}</Text>
-          <Text style={styles.shopName}>{shopName}</Text>
-        </View>
-        <View style={styles.vendorInfo}>
-          <Text style={styles.vendorDate}>{formatDate(date)}</Text>
-        </View>
-      </View>
-    </View>
-  ) : null;
-};
-
-export default function SearchItems() {
+const SearchItems = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedShop, setSelectedShop] = useState('');
-  const [foodItems, setFoodItems] = useState([]);
-  const [filteredFoodItems, setFilteredFoodItems] = useState([]);
-  const [userData, setUserData] = useState(null);
+  const [selectedShop, setSelectedShop] = useState('All');
+  const [productModalVisible, setProductModalVisible] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const openModal = () => setModalVisible(true);
-  const closeModal = () => setModalVisible(false);
-
-  const dummyFoodItems = [
+  const foodItems = [
     {
       id: '1',
-      name: 'Parle-G Biscuits',
-      category: 'snacks',
+      name: 'Idli Sambar',
+      category: 'breakfast',
       isVeg: true,
-      price: '10',
-      image: 'https://example.com/biscuit.jpg',
-      date: '2025-08-05',
-      shopName: 'Ravi General Store',
-      description: 'Classic glucose biscuits',
+      price: '40',
+      image: 'https://example.com/idli.jpg',
+      shop: 'Annapurna Canteen',
+      description: 'South Indian breakfast',
     },
     {
       id: '2',
-      name: 'Sanitary Pads',
-      category: 'essentials',
-      isVeg: true,
-      price: '35',
-      image: 'https://example.com/pads.jpg',
-      date: '2025-08-06',
-      shopName: 'Health & Care Mart',
-      description: 'Pack of 6, extra soft',
+      name: 'Chicken Biryani',
+      category: 'lunch',
+      isVeg: false,
+      price: '120',
+      image: 'https://example.com/biryani.jpg',
+      shop: 'KFC Block C',
+      description: 'Spicy and flavorful biryani with chicken.',
     },
     {
       id: '3',
-      name: 'Paracetamol 500mg',
-      category: 'medicines',
+      name: 'Veg Sandwich',
+      category: 'snack',
       isVeg: true,
-      price: '15',
-      image: 'https://example.com/paracetamol.jpg',
-      date: '2025-08-06',
-      shopName: 'Campus Medical',
-      description: 'Fever and pain relief',
+      price: '30',
+      image: 'https://example.com/sandwich.jpg',
+      shop: 'Cafe Delight',
+      description: 'Fresh vegetables between soft bread.',
     },
   ];
 
-  useEffect(() => {
-    setUserData({ name: 'Darshan' });
-    setFoodItems(dummyFoodItems);
-    setFilteredFoodItems(dummyFoodItems);
-    setSelectedShop(dummyFoodItems[0].shopName || '');
-  }, []);
+  const uniqueShops = useMemo(() => {
+    const shopSet = new Set(foodItems.map(item => item.shop));
+    return ['All', ...Array.from(shopSet)];
+  }, [foodItems]);
 
-  useEffect(() => {
-    const filteredItems = foodItems.filter(item =>
-      (selectedFilter === 'all' || item.category.includes(selectedFilter)) &&
-      (selectedShop === '' || item.shopName === selectedShop) &&
+  const filteredFoodItems = useMemo(() => {
+    return foodItems.filter(item =>
+      (selectedFilter === 'all' || item.category === selectedFilter) &&
+      (selectedShop === 'All' || item.shop === selectedShop) &&
       item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setFilteredFoodItems(filteredItems);
   }, [foodItems, selectedFilter, selectedShop, searchQuery]);
 
-  const renderFoodItem = ({ item }) => (
-    <Card {...item} searchQuery={searchQuery} />
-  );
-
-  const uniqueShops = useMemo(() => {
-    const shopSet = new Set();
-    foodItems.forEach(item => shopSet.add(item.shopName));
-    return Array.from(shopSet);
-  }, [foodItems]);
+  const openProductModal = (item) => {
+    setSelectedProduct(item);
+    setProductModalVisible(true);
+  };
 
   return (
     <ScrollView style={styles.container}>
+      {/* Header with back arrow and shop filter */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <FeatherIcon name="arrow-left" size={24} color="#007bff" />
+          <FeatherIcon name="arrow-left" size={24} color="#000" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={openModal}>
-          <View style={styles.locationContainer}>
-            <Text style={styles.locationText}>{selectedShop || 'Select Shop'}</Text>
-            <FeatherIcon name="chevron-down" size={20} color="#007bff" />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('UserSiderMenu')}>
-          <View style={styles.userCircle}>
-            {userData && <Text style={styles.userInitials}>{userData.name.charAt(0).toUpperCase()}</Text>}
-          </View>
+
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.shopSelector}>
+          <Text style={styles.shopSelectorText}>{selectedShop}</Text>
+          <FeatherIcon name="chevron-down" size={20} color="#007bff" />
         </TouchableOpacity>
       </View>
 
+      {/* Search Box */}
       <View style={styles.searchBoxContainer}>
         <FeatherIcon name="search" size={20} color="#999" style={styles.searchIcon} />
         <TextInput
           style={styles.searchBox}
-          placeholder="Search items"
+          placeholder="Search food items"
           placeholderTextColor="#999"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
       </View>
 
+      {/* Filter Chips */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
         <View style={styles.filters}>
-          {['all', 'snacks', 'essentials', 'medicines'].map(filter => (
+          {['all', 'breakfast', 'lunch', 'snack', 'dinner'].map(filter => (
             <TouchableOpacity
               key={filter}
               style={[styles.filterButton, selectedFilter === filter && styles.selectedFilter]}
@@ -156,12 +110,30 @@ export default function SearchItems() {
         </View>
       </ScrollView>
 
+      {/* Product List */}
       {filteredFoodItems.length > 0 ? (
         <FlatList
           data={filteredFoodItems}
-          renderItem={renderFoodItem}
           keyExtractor={(item) => item.id}
-          style={styles.foodList}
+          contentContainerStyle={styles.foodList}
+          renderItem={({ item }) => (
+            <View style={styles.foodCard}>
+              <Image source={{ uri: item.image }} style={styles.foodImage} />
+              <View style={styles.priceBadge}>
+                <Text style={styles.priceText}>₹{item.price}</Text>
+              </View>
+
+              <TouchableOpacity style={styles.infoIcon} onPress={() => openProductModal(item)}>
+                <FeatherIcon name="info" size={18} color="#fff" />
+              </TouchableOpacity>
+
+              <View style={styles.foodBottom}>
+                <Text style={styles.foodName}>{item.name}</Text>
+                <Text style={styles.foodDesc}>{item.description}</Text>
+                <Text style={styles.shopName}>{item.shop}</Text>
+              </View>
+            </View>
+          )}
         />
       ) : (
         <View style={styles.noItemsContainer}>
@@ -169,10 +141,14 @@ export default function SearchItems() {
         </View>
       )}
 
-      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={closeModal}>
+      {/* Shop Selection Modal */}
+      <Modal transparent animationType="slide" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Select Shop</Text>
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeIcon}>
+              <FeatherIcon name="x" size={24} color="#000" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Select Shop</Text>
             <Picker
               selectedValue={selectedShop}
               onValueChange={(itemValue) => setSelectedShop(itemValue)}
@@ -182,50 +158,81 @@ export default function SearchItems() {
                 <Picker.Item key={index} label={shop} value={shop} />
               ))}
             </Picker>
-            <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
-              <Text style={styles.textStyle}>Done</Text>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Product Info Modal */}
+      <Modal transparent visible={productModalVisible} animationType="fade">
+        <View style={styles.centeredView}>
+          <View style={styles.productDetailModal}>
+            <TouchableOpacity onPress={() => setProductModalVisible(false)} style={styles.closeIcon}>
+              <FeatherIcon name="x" size={24} color="#000" />
             </TouchableOpacity>
+            {selectedProduct && (
+              <>
+                <Text style={styles.modalTitle}>{selectedProduct.name}</Text>
+                <Image source={{ uri: selectedProduct.image }} style={styles.modalImage} />
+                <Text style={styles.modalText}>{selectedProduct.description}</Text>
+                <Text style={styles.modalText}>Shop: {selectedProduct.shop}</Text>
+                <Text style={styles.modalText}>Price: ₹{selectedProduct.price}</Text>
+              </>
+            )}
           </View>
         </View>
       </Modal>
     </ScrollView>
   );
-}
+};
+
+export default SearchItems;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 10, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: '#f9f9f9', padding: 16 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  locationContainer: { flexDirection: 'row', alignItems: 'center' },
-  locationText: { fontSize: 16, color: '#007bff', marginRight: 5 },
-  userCircle: { width: 35, height: 35, borderRadius: 20, backgroundColor: '#007bff', justifyContent: 'center', alignItems: 'center' },
-  userInitials: { color: '#fff', fontSize: 18 },
-  searchBoxContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#eee', borderRadius: 8, padding: 8, marginBottom: 10 },
-  searchBox: { flex: 1, marginLeft: 10, fontSize: 16 },
-  searchIcon: {},
+  shopSelector: { flexDirection: 'row', alignItems: 'center' },
+  shopSelectorText: { fontSize: 16, color: '#007bff', marginRight: 4 },
+
+  searchBoxContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, marginVertical: 10 },
+  searchBox: { flex: 1, height: 40, color: '#333' },
+  searchIcon: { marginRight: 8 },
+
   filterScroll: { marginBottom: 10 },
-  filters: { flexDirection: 'row' },
-  filterButton: { paddingVertical: 6, paddingHorizontal: 15, backgroundColor: '#eee', borderRadius: 20, marginHorizontal: 5 },
+  filters: { flexDirection: 'row', gap: 8 },
+  filterButton: { backgroundColor: '#e0e0e0', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 20 },
   selectedFilter: { backgroundColor: '#007bff' },
   filterText: { fontSize: 14, color: '#333' },
   selectedFilterText: { color: '#fff' },
-  foodList: { marginBottom: 20 },
-  foodCard: { borderRadius: 10, marginBottom: 15, backgroundColor: '#f9f9f9', overflow: 'hidden' },
-  foodImage: { width: '100%', height: 200 },
-  priceBadge: { position: 'absolute', top: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5 },
+
+  foodList: { gap: 12 },
+  foodCard: { backgroundColor: '#fff', borderRadius: 10, overflow: 'hidden', marginBottom: 12, elevation: 2 },
+  foodImage: { width: '100%', height: 180 },
+  priceBadge: {
+    position: 'absolute', top: 10, right: 10,
+    backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6,
+  },
   priceText: { color: '#fff', fontWeight: 'bold' },
-  foodBottom: { flexDirection: 'row', justifyContent: 'space-between', padding: 10 },
-  foodLeft: { flex: 1 },
-  foodName: { fontSize: 18, fontWeight: 'bold', marginBottom: 2 },
-  vendorName: { fontSize: 14, color: '#555' },
-  shopName: { fontSize: 14, color: '#007bff', marginTop: 4 },
-  vendorInfo: { justifyContent: 'center', alignItems: 'flex-end' },
-  vendorDate: { fontSize: 13, color: '#777' },
-  noItemsContainer: { alignItems: 'center', marginTop: 30 },
-  noItemsText: { fontSize: 16, color: '#888' },
-  centeredView: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
-  modalView: { backgroundColor: 'white', borderRadius: 10, padding: 20, alignItems: 'center', width: '80%' },
-  modalText: { fontSize: 18, marginBottom: 10 },
+
+  foodBottom: { padding: 10 },
+  foodName: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+  foodDesc: { fontSize: 14, color: '#666', marginTop: 4 },
+  shopName: { fontSize: 13, color: '#007bff', marginTop: 4 },
+
+  infoIcon: {
+    position: 'absolute', bottom: 10, right: 10,
+    backgroundColor: '#007bff', padding: 8, borderRadius: 50
+  },
+
+  noItemsContainer: { alignItems: 'center', padding: 20 },
+  noItemsText: { fontSize: 16, color: '#666' },
+
+  centeredView: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)' },
+  modalView: { backgroundColor: '#fff', padding: 20, borderRadius: 10, width: '85%' },
+  closeIcon: { position: 'absolute', top: 10, right: 10 },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 20 },
   modalPicker: { width: '100%' },
-  modalButton: { marginTop: 15, padding: 10, backgroundColor: '#007bff', borderRadius: 5 },
-  textStyle: { color: 'white', fontWeight: 'bold' }
+
+  productDetailModal: { backgroundColor: '#fff', padding: 20, borderRadius: 10, width: '85%', alignItems: 'center' },
+  modalImage: { width: '100%', height: 150, borderRadius: 10, marginVertical: 10 },
+  modalText: { fontSize: 14, color: '#333', marginBottom: 6 },
 });
